@@ -98,13 +98,12 @@ var app = {
             resultDiv.scrollTop = resultDiv.scrollHeight;
         };
 
-        var failure = function() {
-            alert("Failed writing data to the connectBlue hardware");
+        var failure = function(reason) {
+            navigator.notification.alert(reason, {}, "Error writing data");
         };
 
         var data = stringToBytes(messageInput.value);
         var deviceId = event.target.dataset.deviceId;
-        //ble.writeWithoutResponse(deviceId, connectBlue.serviceUUID, connectBlue.txCharacteristic, data, success, failure);
         ble.write(deviceId, connectBlue.serviceUUID, connectBlue.txCharacteristic, data, success, failure);
     },
     disconnect: function(event) {
@@ -120,6 +119,6 @@ var app = {
         detailPage.hidden = false;
     },
     onError: function(reason) {
-        alert("ERROR: " + reason); // real apps should use notification.alert
+        navigator.notification.alert(reason, {}, "Error");
     }
 };
