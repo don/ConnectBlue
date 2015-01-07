@@ -10,4 +10,5 @@ Install
 
     $ cordova platform add ios
     $ cordova plugin add com.megster.cordova.ble
+    $ cordova plugin add org.apache.cordova.dialogs
     $ cordova run
