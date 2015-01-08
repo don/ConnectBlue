@@ -4,7 +4,7 @@ http://support.connectblue.com/display/PRODBTSPA/connectBlue+Low+Energy+Serial+P
 
 Hardware
 
- * [Bluetooth SPA Starter Kit USB OBS419](http://www.connectblue.com/products/starter-kits-evaluation-kits/)
+ * [ConnectBlue OBS421](http://www.u-blox.com/en/bluetooth-wifi-multiradio-modules/bluetooth-modules/obs421-dual-mode-bluetooth-module.html)
 
 Install
 
