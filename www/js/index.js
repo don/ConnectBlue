@@ -106,17 +106,16 @@ var app = {
 
                 sendButton.dataset.deviceId = deviceId;
                 disconnectButton.dataset.deviceId = deviceId;
-                resultDiv.innerHTML = ""; // clear old date
+                resultDiv.innerHTML = ""; // clear old data
                 app.showDetailPage();
             };
 
         ble.connect(deviceId, onConnect, app.onError);
     },
-    onData: function(data) { // data received from Arduino
-        console.log(JSON.stringify(data));
-        var dataAsString = bytesToString(data);
-        console.log(dataAsString);
-        resultDiv.innerHTML = resultDiv.innerHTML + "Received: " + dataAsString + "<br/>";
+    onData: function(buffer) { // data received from Arduino
+        var data = bytesToString(buffer);
+        console.log(data);
+        resultDiv.innerHTML = resultDiv.innerHTML + "Received: " + data + "<br/>";
         resultDiv.scrollTop = resultDiv.scrollHeight;
     },
     sendData: function(event) { // send data to Arduino
