@@ -34,10 +34,12 @@ function stringToBytes(string) {
 
 // this is ConnectBlue's UART service
 // http://support.connectblue.com/display/PRODBTSPA/connectBlue+Low+Energy+Serial+Port+Service
+// TODO consider combining tx and rx into FIFO
 var connectBlue = {
     serviceUUID: "2456e1b9-26e2-8f83-e744-f34f01e9d701",
     txCharacteristic: "2456e1b9-26e2-8f83-e744-f34f01e9d703", // transmit is from the phone's perspective
-    rxCharacteristic: "2456e1b9-26e2-8f83-e744-f34f01e9d703"  // receive is from the phone's perspective
+    rxCharacteristic: "2456e1b9-26e2-8f83-e744-f34f01e9d703",  // receive is from the phone's perspective
+    creditsCharacteristic: "2456e1b9-26e2-8f83-e744-f34f01e9d704"
 };
 
 var app = {
@@ -76,18 +78,45 @@ var app = {
     connect: function(e) {
         var deviceId = e.target.dataset.deviceId,
             onConnect = function() {
-                // subscribe for incoming data
+
+                // documentation lists credits as optional, but appears to be required
+                // http://support.connectblue.com/display/PRODBTSPA/connectBlue+Low+Energy+Serial+Port+Service
+                ble.notify(deviceId, connectBlue.serviceUUID, connectBlue.creditsCharacteristic,
+                    function(buffer) { // success
+                        var data = new Uint8Array(buffer)[0];
+                        console.log("Server sent " + data + " credits");
+                        if (data === 0xFF) {
+                            var message = 'Server disconnected by sending -1 (0xFF) credits';
+                            navigator.notification.alert(message, app.showMainPage, "Disconnect");
+                        }
+                    },
+                    app.onError);
+
+                // subscribe for incoming data, must happen after creditsCharacteristic
                 ble.notify(deviceId, connectBlue.serviceUUID, connectBlue.rxCharacteristic, app.onData, app.onError);
+
+                // send credits to the server
+                var credits = new Uint8Array(1);
+                credits[0] = 0x7F; // 127
+                ble.write(deviceId, connectBlue.serviceUUID,
+                    connectBlue.creditsCharacteristic, credits.buffer,
+                    function() {
+                        console.log('Sent ' + credits[0] + ' credits to server');
+                    }, app.onError);
+
                 sendButton.dataset.deviceId = deviceId;
                 disconnectButton.dataset.deviceId = deviceId;
+                resultDiv.innerHTML = ""; // clear old date
                 app.showDetailPage();
             };
 
         ble.connect(deviceId, onConnect, app.onError);
     },
     onData: function(data) { // data received from Arduino
-        console.log(data);
-        resultDiv.innerHTML = resultDiv.innerHTML + "Received: " + bytesToString(data) + "<br/>";
+        console.log(JSON.stringify(data));
+        var dataAsString = bytesToString(data);
+        console.log(dataAsString);
+        resultDiv.innerHTML = resultDiv.innerHTML + "Received: " + dataAsString + "<br/>";
         resultDiv.scrollTop = resultDiv.scrollHeight;
     },
     sendData: function(event) { // send data to Arduino
