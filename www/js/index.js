@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /* global mainPage, deviceList, refreshButton */
-/* global detailPage, resultDiv, messageInput, sendButton, disconnectButton */
+/* global detailPage, txCreditsSpan, rxCreditsSpan, resultDiv */
+/* global messageInput, sendButton, clearButton, disconnectButton */
 /* global ble, cordova  */
 /* jshint browser: true , devel: true*/
 'use strict';
