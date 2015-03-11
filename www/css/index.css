@@ -22,8 +22,8 @@ button {
 }
 
 input[type=text] {
-    width: 100%;
-    font-size: 0.6em;
+    width: 70%;
+    font-size: 1.5em;
 }
 
 #mainPage {
@@ -32,16 +32,13 @@ input[type=text] {
 
 #detailPage {
     text-align:center;
-    font-size: 2em;
 }
 
 #detailPage div {
-    margin: 20px;
 }
 
 #detailPage button {
-    margin-top: 40px;
-    font-size: 0.6em; /* undo 2em from parent */
+    margin-top: 20px;
 }
 
 ul {
@@ -62,7 +59,7 @@ li {
 button {
     -webkit-appearance: none;
     font-size: 1.5em;
-    border-radius: 0;
+    padding: 10px;
 }
 
 #resultDiv {
@@ -70,8 +67,11 @@ button {
     font-weight: 200;
     display: block;
     -webkit-border-radius: 6px;
-    width: 100%;
+    width: 90%;
     height: 140px;
     text-align: left;
     overflow: auto;
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-bottom: 10px;
 }
