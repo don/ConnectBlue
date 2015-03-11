@@ -43,6 +43,9 @@ var connectBlue = {
 };
 
 var app = {
+    txCredits: 10,
+    rxCredits: 10,
+    deviceId: null,
     initialize: function() {
         this.bindEvents();
         detailPage.hidden = true;
@@ -81,10 +84,12 @@ var app = {
 
                 // documentation lists credits as optional, but appears to be required
                 // http://support.connectblue.com/display/PRODBTSPA/connectBlue+Low+Energy+Serial+Port+Service
-                ble.notify(deviceId, connectBlue.serviceUUID, connectBlue.creditsCharacteristic,
+                ble.startNotification(deviceId, connectBlue.serviceUUID,
+                    connectBlue.creditsCharacteristic,
                     function(buffer) { // success
                         var data = new Uint8Array(buffer)[0];
                         console.log("Server sent " + data + " credits");
+                        app.txCredits = data;
                         if (data === 0xFF) {
                             var message = 'Server disconnected by sending -1 (0xFF) credits';
                             navigator.notification.alert(message, app.showMainPage, "Disconnect");
@@ -93,11 +98,14 @@ var app = {
                     app.onError);
 
                 // subscribe for incoming data, must happen after creditsCharacteristic
-                ble.notify(deviceId, connectBlue.serviceUUID, connectBlue.rxCharacteristic, app.onData, app.onError);
+                ble.startNotification(deviceId, connectBlue.serviceUUID,
+                    connectBlue.rxCharacteristic, app.onData, app.onError);
 
                 // send credits to the server
+                app.deviceId = deviceId;
+                //app.sendCredits();
                 var credits = new Uint8Array(1);
-                credits[0] = 0x7F; // 127
+                credits[0] = 0x02; // 127
                 ble.write(deviceId, connectBlue.serviceUUID,
                     connectBlue.creditsCharacteristic, credits.buffer,
                     function() {
@@ -117,6 +125,11 @@ var app = {
         console.log(data);
         resultDiv.innerHTML = resultDiv.innerHTML + "Received: " + data + "<br/>";
         resultDiv.scrollTop = resultDiv.scrollHeight;
+
+        app.rxCredits--;
+        if (app.rxCredits === 0) {
+
+        }
     },
     sendData: function(event) { // send data to Arduino
 
@@ -124,6 +137,7 @@ var app = {
             console.log("success");
             resultDiv.innerHTML = resultDiv.innerHTML + "Sent: " + messageInput.value + "<br/>";
             resultDiv.scrollTop = resultDiv.scrollHeight;
+            app.txCredits--;
         };
 
         var failure = function(reason) {
@@ -133,6 +147,23 @@ var app = {
         var data = stringToBytes(messageInput.value);
         var deviceId = event.target.dataset.deviceId;
         ble.write(deviceId, connectBlue.serviceUUID, connectBlue.txCharacteristic, data, success, failure);
+    },
+    sendCredits: function() {
+
+        // This assumes there is only one connected device since it uses app.deviceId
+        var credits = 10;
+
+        var success = function() {
+            console.log("Sent " + credits + " credits to the server");
+        };
+
+        var failure = function(reason) {
+            navigator.notification.alert(reason, {}, "Unable to send rxCredits");
+        };
+
+        var data = new Uint8Array(1);
+        data[0] = credits;
+        ble.write(app.deviceId, connectBlue.serviceUUID, connectBlue.creditsCharacteristic, data, success, failure);
     },
     disconnect: function(event) {
         var deviceId = event.target.dataset.deviceId;
