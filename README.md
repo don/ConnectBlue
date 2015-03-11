@@ -1,6 +1,6 @@
 ## ConnectBlue BLE SPP
 
-http://support.connectblue.com/display/PRODBTSPA/connectBlue+Low+Energy+Serial+Port+Service
+[ConnectBlue Low Energy Serial Port Service](http://support.connectblue.com/display/PRODBTSPA/connectBlue+Low+Energy+Serial+Port+Service)
 
 Hardware
 
